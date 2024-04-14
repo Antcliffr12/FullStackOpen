@@ -7,21 +7,29 @@ function App() {
   const [ good, setGood ] = useState(0);
   const [ neutral, setNeutral] = useState(0);
   const [ bad, setBad] = useState(0);
+  const [ total, setTotal ] = useState(0);
 
   const handleGoodClicks = () => {
     const goodClicks = good + 1;
       setGood(goodClicks);
+      setTotal(goodClicks + neutral + bad )
   }
 
   const handleNeutralClicks = () => {
     const neutralClicks = neutral + 1;
     setNeutral(neutralClicks)
+    setTotal(neutralClicks + good + bad )
+
   }
 
   const handleBadClicks = () => {
     const badClicks = bad + 1;
     setBad(badClicks)
+    setTotal(badClicks + neutral + good )
+
+    
   }
+
   return (
     <div>
       <h1>Give Feedback</h1>
@@ -34,6 +42,7 @@ function App() {
         <li>Good: {good}</li>
         <li>Neutral: {neutral}</li>
         <li>Bad: {bad}</li>
+        <li>Total: {total}</li>
       </ul>
     </div>
   )
