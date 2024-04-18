@@ -21,7 +21,6 @@ function Course({ courses }) {
         <Content parts={course.parts} />
         <Total sum={course.parts.reduce((sum, part) => sum + part.exercises, 0)} />
       </div>
-      
     ))
   )
 }
