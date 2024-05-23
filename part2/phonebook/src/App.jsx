@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 
 import Filter from "./Components/Filter";
 import PersonForm from "./Components/PersonForm";
 import Persons from "./Components/Persons";
+
+import personServices from "./services/persons";
 
 const App = () => {
 	const [persons, setPersons] = useState([]);
@@ -12,15 +13,9 @@ const App = () => {
 	const [searchInput, setSearchInput] = useState("");
 
 	const getData = () => {
-		axios
-			.get("http://localhost:3002/persons")
-			.then((response) => {
-				console.log("Fetched data:", response.data);
-				setPersons(response.data);
-			})
-			.catch((error) => {
-				console.error("Error fetching data:", error);
-			});
+		personServices.getAll().then((initPersons) => {
+			setPersons(initPersons);
+		});
 	};
 
 	useEffect(getData, []);
@@ -41,13 +36,11 @@ const App = () => {
 			return;
 		}
 
-		axios
-			.post("http://localhost:3002/persons", personObject)
-			.then((response) => {
-				setPersons(persons.concat(response.data));
-				setNewName("");
-				setNewNumber("");
-			});
+		personServices.create(personObject).then((returnedPerson) => {
+			setPersons(persons.concat(returnedPerson));
+			setNewName("");
+			setNewNumber("");
+		});
 	};
 	const handleNewName = (event) => {
 		setNewName(event.target.value);
