@@ -2,7 +2,7 @@ const Persons = (props) => {
 	const persons = props.search.map((person, i) => {
 		return (
 			<li key={i}>
-				{person.name} {person.phone}
+				{person.name} {person.number}
 			</li>
 		);
 	});

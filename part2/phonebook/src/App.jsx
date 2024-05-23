@@ -5,21 +5,23 @@ import Filter from "./Components/Filter";
 import PersonForm from "./Components/PersonForm";
 import Persons from "./Components/Persons";
 
-const App = (props) => {
-	const [persons, setPersons] = useState([
-		{ name: "Arto Hellas", phone: "040-1234567" },
-	]);
-
+const App = () => {
+	const [persons, setPersons] = useState([]);
 	const [newName, setNewName] = useState("");
 	const [newNumber, setNewNumber] = useState("");
 	const [searchInput, setSearchInput] = useState("");
 
-	function getData() {
-		axios.get("http://localhost:3001/persons").then((response) => {
-			const persons = response.data;
-			setPersons(persons);
-		});
-	}
+	const getData = () => {
+		axios
+			.get("http://localhost:3002/persons")
+			.then((response) => {
+				console.log("Fetched data:", response.data);
+				setPersons(response.data);
+			})
+			.catch((error) => {
+				console.error("Error fetching data:", error);
+			});
+	};
 
 	useEffect(getData, []);
 
@@ -27,7 +29,7 @@ const App = (props) => {
 		event.preventDefault();
 		const personObject = {
 			name: newName,
-			phone: newNumber,
+			number: newNumber,
 			id: newName.length + 1,
 		};
 
@@ -39,9 +41,13 @@ const App = (props) => {
 			return;
 		}
 
-		setPersons(persons.concat(personObject));
-		setNewName("");
-		setNewNumber("");
+		axios
+			.post("http://localhost:3002/persons", personObject)
+			.then((response) => {
+				setPersons(persons.concat(response.data));
+				setNewName("");
+				setNewNumber("");
+			});
 	};
 	const handleNewName = (event) => {
 		setNewName(event.target.value);
@@ -52,14 +58,13 @@ const App = (props) => {
 	};
 
 	const searchItems = (event) => {
-		console.log(event.target.value);
 		setSearchInput(event.target.value);
 	};
 
-	const searchFilter = persons.filter((person) =>
-		person.name.toLowerCase().includes(searchInput.toLowerCase())
-	);
-
+	const searchFilter = persons.filter((person) => {
+		return person.name.toLowerCase().includes(searchInput.toLowerCase());
+	});
+	console.log(persons);
 	return (
 		<div>
 			<h2>Phonebook</h2>
@@ -68,7 +73,7 @@ const App = (props) => {
 			<hr />
 			<h3>Add a new</h3>
 			<PersonForm
-				onSumbit={addPerson}
+				onSubmit={addPerson}
 				nameValue={newName}
 				nameHandleChange={handleNewName}
 				numberValue={newNumber}
