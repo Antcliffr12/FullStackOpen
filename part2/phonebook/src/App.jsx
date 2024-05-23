@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-
+import axios from "axios";
 import Filter from "./Components/Filter";
 import PersonForm from "./Components/PersonForm";
 import Persons from "./Components/Persons";
@@ -25,7 +25,7 @@ const App = () => {
 		const personObject = {
 			name: newName,
 			number: newNumber,
-			id: newName.length + 1,
+			id: JSON.stringify(newName.length + 1),
 		};
 
 		const nameExists =
@@ -57,12 +57,31 @@ const App = () => {
 	const searchFilter = persons.filter((person) => {
 		return person.name.toLowerCase().includes(searchInput.toLowerCase());
 	});
-	console.log(persons);
+
+	const deletePersons = (id) => {
+		const person = persons.find((person) => person.id === id);
+		const changedPerson = {
+			...person,
+			id: person.id,
+		};
+		console.log(changedPerson);
+		personServices
+			.remove(id, changedPerson)
+			.then((returnedPerson) => {
+				setPersons(
+					person.map((person) => (person.id !== id ? person : returnedPerson))
+				);
+			})
+			.catch((error) => {
+				alert(`Person ${person.name} is being deleted from server`);
+				setPersons(persons.filter((person) => person.id !== id));
+			});
+	};
+
 	return (
 		<div>
 			<h2>Phonebook</h2>
 			<Filter filter={searchItems} />
-			{/* filter shwn with <input onChange={searchItems} /> */}
 			<hr />
 			<h3>Add a new</h3>
 			<PersonForm
@@ -73,7 +92,14 @@ const App = () => {
 				numberHandleChange={handleNewNumber}
 			/>
 			<h2>Numbers</h2>
-			<Persons search={searchFilter} />
+			{searchFilter.map((person) => (
+				<Persons
+					key={person.id}
+					name={person.name}
+					number={person.number}
+					deletePerson={() => deletePersons(person.id)}
+				/>
+			))}
 		</div>
 	);
 };
