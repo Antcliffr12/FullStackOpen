@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+
 import Filter from "./Components/Filter";
 import PersonForm from "./Components/PersonForm";
 import Persons from "./Components/Persons";
-
+import Notification from "./Components/Notification";
 import personServices from "./services/persons";
 
 const App = () => {
@@ -11,6 +11,7 @@ const App = () => {
 	const [newName, setNewName] = useState("");
 	const [newNumber, setNewNumber] = useState("");
 	const [searchInput, setSearchInput] = useState("");
+	const [successMessage, setSuccessMessage] = useState(null);
 
 	const getData = () => {
 		personServices.getAll().then((initPersons) => {
@@ -25,7 +26,6 @@ const App = () => {
 		const personObject = {
 			name: newName,
 			number: newNumber,
-			id: JSON.stringify(newName.length + 1),
 		};
 
 		const nameExists =
@@ -37,9 +37,14 @@ const App = () => {
 		}
 
 		personServices.create(personObject).then((returnedPerson) => {
+			setSuccessMessage("Success");
 			setPersons(persons.concat(returnedPerson));
 			setNewName("");
 			setNewNumber("");
+
+			setTimeout(() => {
+				setSuccessMessage(null);
+			}, 5000);
 		});
 	};
 	const handleNewName = (event) => {
@@ -77,11 +82,12 @@ const App = () => {
 				setPersons(persons.filter((person) => person.id !== id));
 			});
 	};
-
+	console.log(successMessage);
 	return (
 		<div>
 			<h2>Phonebook</h2>
 			<Filter filter={searchItems} />
+			<Notification message={successMessage} />
 			<hr />
 			<h3>Add a new</h3>
 			<PersonForm
