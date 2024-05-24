@@ -5,7 +5,7 @@ import Country from "./Components/Country";
 function App() {
 	const [countries, setCountries] = useState(null);
 	const [searchCountries, setSearchCountries] = useState("");
-	const [selectedCountry, setSelectedCountry] = useState(null);
+	const [country, setCountry] = useState(null);
 
 	const getAllCountries = () => {
 		axios
@@ -15,16 +15,14 @@ function App() {
 			});
 	};
 
-	const getCountryByName = (country) => {
-		console.log(country.name.common);
+	const getCountryByName = () => {
 		axios
-			.get(
-				`https://studies.cs.helsinki.fi/restcountries/api/name/${country.name.common}`
-			)
+			.get("https://studies.cs.helsinki.fi/restcountries/api/name/sweden")
 			.then((response) => {
-				setSelectedCountry(response.data);
+				console.log(response.data, "data");
 			});
 	};
+
 	useEffect(() => {
 		getAllCountries();
 	}, []);
@@ -34,7 +32,6 @@ function App() {
 	}
 
 	const searchInput = (event) => {
-		console.log(countries.length);
 		setSearchCountries(event.target.value);
 	};
 	const searchFilter = countries.filter((country) => {
@@ -46,12 +43,10 @@ function App() {
 	return (
 		<div>
 			find countries: <input onChange={searchInput} />
-			{searchFilter.length >= 10 ? (
+			{searchFilter.length === 1 ? (
+				<p>Matching 1 Country</p>
+			) : searchFilter.length >= 10 ? (
 				<p>Too many matches, specify another filter</p>
-			) : searchFilter.length === 1 ? (
-				searchFilter.map((country) => {
-					getCountryByName(country);
-				})
 			) : searchFilter.length >= 1 ? (
 				searchFilter.map((country) => {
 					return <Country key={country.cca2} name={country.name.common} />;
