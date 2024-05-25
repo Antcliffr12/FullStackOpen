@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
+import Filter from "./Components/Filter";
+import CountryName from "./Components/CountryName";
+import CountryDetails from "./Components/CountryDetails";
+
 const App = () => {
 	const [countries, setCountries] = useState(null);
 	const [searchCountries, setSearchCountries] = useState("");
@@ -44,36 +48,26 @@ const App = () => {
 
 	return (
 		<div>
-			<input
-				type="text"
-				placeholder="Search countries"
-				onChange={handleCountrySearch}
-			/>
+			<Filter filter={handleCountrySearch} />
 			{filterCountries.length === 1 ? (
 				<ul>
 					{filterCountries.map((country) => {
 						return (
-							<div key={country.cca2}>
-								<h1>{country.name.common}</h1>
-								<p>Capital: {country.capital}</p>
-								<p>Area: {country.area}</p>
-								<p>Languages:</p>
-								<ul>
-									{Object.entries(country.languages).map(([key, value]) => (
-										<li key={key}>{value}</li>
-									))}
-								</ul>
-								<p>
-									<img src={country.flags.svg} alt="country flag" width={300} />
-								</p>
-							</div>
+							<CountryDetails
+								key={country.cca2}
+								name={country.name.common}
+								capital={country.capital}
+								area={country.area}
+								languages={country.languages}
+								flag={country.flags.svg}
+							/>
 						);
 					})}
 				</ul>
 			) : filterCountries.length < 10 ? (
 				<ul>
 					{filterCountries.map((country) => (
-						<li key={country.cca2}>{country.name.common}</li>
+						<CountryName key={country.cca2} name={country.name.common} />
 					))}
 				</ul>
 			) : (
