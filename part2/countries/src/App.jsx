@@ -2,55 +2,83 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 
 const App = () => {
-	const [searchCountries, setSearchCountries] = useState("");
 	const [countries, setCountries] = useState(null);
-	const [country, setCountry] = useState({});
+	const [searchCountries, setSearchCountries] = useState("");
+	const [countryData, setCountryData] = useState(null);
 
 	useEffect(() => {
-		console.log("effect run, country is now", countries);
+		axios
+			.get("https://studies.cs.helsinki.fi/restcountries/api/all")
+			.then((response) => {
+				console.log(response.data);
+				setCountries(response.data);
+			});
+	}, []);
 
-		if (countries) {
+	useEffect(() => {
+		if (searchCountries.length === 1) {
 			axios
 				.get(
-					`https://studies.cs.helsinki.fi/restcountries/api/name/${countries}`
+					`https://studies.cs.helsinki.fi/restcountries/api/name/${searchCountries}`
 				)
 				.then((response) => {
-					console.log(response.data);
-					setCountry(response.data);
-				})
-				.catch((error) => {
-					console.log("Could not fetch countries", error);
+					console.log(response.data, "countryData");
+					setCountryData(response.data);
 				});
 		}
-	}, [countries]);
+	}, [searchCountries]);
 
-	const handleChange = (event) => {
-		setSearchCountries(event.target.value);
-	};
-
-	const onSearch = (event) => {
-		event.preventDefault();
-		setCountries(searchCountries);
-	};
-
-	let name = "";
-	let flag = "";
-	let languages = [];
-	if (country) {
-		name = country.name?.common;
-		flag = country.flag;
+	if (!countries) {
+		return null;
 	}
+
+	const handleCountrySearch = (e) => {
+		setSearchCountries(e.target.value);
+	};
+
+	const filterCountries = countries.filter((country) => {
+		return country.name.common
+			.toLowerCase()
+			.includes(searchCountries.toLocaleLowerCase());
+	});
+
 	return (
 		<div>
-			<form onSubmit={onSearch}>
-				<input type="text" value={searchCountries} onChange={handleChange} />
-				<button type="submit">Country</button>
-			</form>
-			<h1>{name}</h1>
-			<h2>{flag}</h2>
-			{country.language?.map((language, i) => {
-				return <li key={i}>{language}</li>;
-			})}
+			<input
+				type="text"
+				placeholder="Search countries"
+				onChange={handleCountrySearch}
+			/>
+			{filterCountries.length === 1 ? (
+				<ul>
+					{filterCountries.map((country) => {
+						return (
+							<div key={country.cca2}>
+								<h1>{country.name.common}</h1>
+								<p>Capital: {country.capital}</p>
+								<p>Area: {country.area}</p>
+								<p>Languages:</p>
+								<ul>
+									{Object.entries(country.languages).map(([key, value]) => (
+										<li key={key}>{value}</li>
+									))}
+								</ul>
+								<p>
+									<img src={country.flags.svg} alt="country flag" width={300} />
+								</p>
+							</div>
+						);
+					})}
+				</ul>
+			) : filterCountries.length < 10 ? (
+				<ul>
+					{filterCountries.map((country) => (
+						<li key={country.cca2}>{country.name.common}</li>
+					))}
+				</ul>
+			) : (
+				<p>Over 10 countries</p>
+			)}
 		</div>
 	);
 };
