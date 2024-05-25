@@ -17,6 +17,7 @@ const Country = (props) => {
 					</p>
 				</div>
 			)}
+			{props.button && <button onClick={props.toggleViewCountry}>Show</button>}
 		</li>
 	);
 };

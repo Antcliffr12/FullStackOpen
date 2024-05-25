@@ -45,11 +45,18 @@ const App = () => {
 			.includes(searchCountries.toLocaleLowerCase());
 	});
 
+	const showCountry = (name) => {
+		const country = countries.find((country) => country.name.common === name);
+		setCountryData(country);
+	};
+
 	return (
 		<div>
 			<Filter filter={handleCountrySearch} />
+
 			{filterCountries.length === 1 ? (
 				<ul>
+					{console.log(countryData)}
 					{filterCountries.map((country) => {
 						return (
 							<Country
@@ -60,6 +67,7 @@ const App = () => {
 								languages={country.languages}
 								flag={country.flags.svg}
 								showDetails={true}
+								button={false}
 							/>
 						);
 					})}
@@ -71,6 +79,8 @@ const App = () => {
 							key={country.cca2}
 							name={country.name.common}
 							showDetails={false}
+							button={true}
+							toggleViewCountry={() => showCountry(country.name.common)}
 						/>
 					))}
 				</ul>
