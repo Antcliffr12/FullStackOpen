@@ -2,8 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 
 import Filter from "./Components/Filter";
-import CountryName from "./Components/CountryName";
-import CountryDetails from "./Components/CountryDetails";
+import Country from "./Components/Country";
 
 const App = () => {
 	const [countries, setCountries] = useState(null);
@@ -53,13 +52,14 @@ const App = () => {
 				<ul>
 					{filterCountries.map((country) => {
 						return (
-							<CountryDetails
+							<Country
 								key={country.cca2}
 								name={country.name.common}
 								capital={country.capital}
 								area={country.area}
 								languages={country.languages}
 								flag={country.flags.svg}
+								showDetails={true}
 							/>
 						);
 					})}
@@ -67,7 +67,11 @@ const App = () => {
 			) : filterCountries.length < 10 ? (
 				<ul>
 					{filterCountries.map((country) => (
-						<CountryName key={country.cca2} name={country.name.common} />
+						<Country
+							key={country.cca2}
+							name={country.name.common}
+							showDetails={false}
+						/>
 					))}
 				</ul>
 			) : (
